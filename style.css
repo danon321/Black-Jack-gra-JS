@@ -1,0 +1,105 @@
+body{
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: Montserrat,sans-serif;
+}
+.menu-container{
+    display:flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+.menu-button-container{
+    width:200px;
+    display: flex;
+    justify-content: space-between;
+}
+.board{
+    display:flex;
+    justify-content: space-evenly;
+    flex-wrap: wrap;
+    width: 100%;
+    margin-bottom:100px;
+}
+.player-board{
+    display:flex;
+    flex-direction: column;
+    align-items: center;
+    border: 2.5px grey solid;
+    padding: 0px 25px;
+    opacity: 0.5;
+    color:#696969;
+    font-weight: 600;
+    position: relative;
+}
+.player-round{
+    border: 2.5px red solid; 
+    opacity:1;
+}
+.cards-container{
+    display:flex;
+    justify-content: space-around;
+}
+.cards-container > .single-card{
+    margin-right: -45px;
+}
+.cards-container > .single-card:last-child{
+    margin-right: 0px;
+}
+.single-card{
+    max-width:125px;
+}
+.container{
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+}
+.control-buttons-container{
+    display:none;
+    justify-content: center;
+    width: 100%;
+}
+.button{
+    cursor:pointer;
+    color:white;
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    background-color: #35654d;
+    padding:20px 10px;
+}
+
+.pass::before, .przegrany::before, .winner::before{
+    background-color: white;
+    font-size: 60px;
+    width: 100%;
+    text-align: center;
+    padding: 10px 0px;
+    color:black;
+    position: absolute;
+    top:37%;
+    z-index: 9999;
+}
+.pass::before{
+    content:"PASS";
+}
+.przegrany::before{
+    content:"PRZEGRANA";
+}
+.przegrany{
+    min-width:335px;
+}
+.winner{
+    border: 2.5px red solid !important; 
+    min-width: 285px;
+}
+.winner::before{
+    content:"WYGRANA";
+}
+
+#playAgain{
+    display:none;
+}
