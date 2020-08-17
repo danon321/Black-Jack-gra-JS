@@ -10,12 +10,6 @@ body{
     justify-content: center;
     align-items: center;
 }
-.menu-logo{
-    max-width:350px;
-}
-.menu-title{
-    color:#606060;
-}
 .menu-button-container{
     width:200px;
     display: flex;
@@ -34,7 +28,6 @@ body{
     align-items: center;
     border: 2.5px grey solid;
     padding: 0px 25px;
-    margin: 15px 10px;
     opacity: 0.5;
     color:#696969;
     font-weight: 600;

@@ -23,33 +23,48 @@ const blackJack = {
         this.getDeck();
     },
     getDeck() {
-        this.xhrFunction("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1", xhttp => {
-            blackJack.deckId = JSON.parse(xhttp.response).deck_id;
-        })
+        xhr.open("GET", "https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1",false);
+        xhr.onload = function(){
+            if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                blackJack.deckId = JSON.parse(xhr.response).deck_id;
+            }
+        }
+        xhr.send(null);
         this.getCards();
     },
     getCards(){
         for (let i = 0; i <= this.numberOfPlayers-1; i++) {
-            this.xhrFunction(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=2`, xhttp => {
-                for (const el of JSON.parse(xhttp.response).cards) {
-                    blackJack.players[i].cards.push(el.code);
-                    blackJack.players[i].points.push(blackJack.valueFilter(el.value));   
-                } 
-            })
-            if(this.players[i].points[0]==="11" && this.players[i].points[1]==="11"){
-               this.players[i].winner = true;
+            const url = `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=2`;
+        
+            xhr.open("GET", url,false);
+            xhr.onreadystatechange = function() {
+                if(xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {
+                    for (const el of JSON.parse(xhr.response).cards) {
+                        blackJack.players[i].cards.push(el.code);
+                        blackJack.players[i].points.push(blackJack.valueFilter(el.value));   
+                    } 
+                }
+            }
+            xhr.send();
+            
+            if(blackJack.players[i].points[0]==="11" && blackJack.players[i].points[1]==="11"){
+                blackJack.players[i].winner = true;
             }
         }
         this.createBoards(); 
     },
     addOneCard(){
-            this.xhrFunction(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`, xhttp => {
-                const JSONcardCode = JSON.parse(xhttp.response).cards[0].code;
-                const JSONcardValue = JSON.parse(xhttp.response).cards[0].value;
-                blackJack.players[blackJack.roundPlayer-1].cards.push(JSONcardCode);
-                blackJack.players[blackJack.roundPlayer-1].points.push(blackJack.valueFilter(JSONcardValue)); 
-                blackJack.createBoards();
-            })
+            xhr.open("GET", `https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`,true);
+            xhr.onreadystatechange = function(){
+                if(this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+                    const JSONcardCode = JSON.parse(xhr.response).cards[0].code;
+                    const JSONcardValue = JSON.parse(xhr.response).cards[0].value;
+                    blackJack.players[blackJack.roundPlayer-1].cards.push(JSONcardCode);
+                    blackJack.players[blackJack.roundPlayer-1].points.push(blackJack.valueFilter(JSONcardValue)); 
+                    blackJack.createBoards();
+                } 
+            }
+            xhr.send(null);
     },
     endOfTheGame(){
         for(let el of this.players){
@@ -167,16 +182,6 @@ const blackJack = {
                 }
             }
         this.createBoards();
-    },
-    xhrFunction(url, cFunction){
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", url, false);
-        xhttp.onreadystatechange = function() {
-          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            cFunction(this);
-          }
-       };
-        xhttp.send(null);
     },
     valueFilter(value){
         if(value.length > 2){
