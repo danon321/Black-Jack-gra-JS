@@ -22,18 +22,28 @@ const blackJack = {
         }
         this.getDeck();
     },
+    xhrFunction(url, cFunction){
+        const xhttp = new XMLHttpRequest();
+        xhttp.open("GET", url, false);
+        xhttp.onreadystatechange = function() {
+          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
+            cFunction(this);
+          }
+       };
+        xhttp.send(null);
+    },
     getDeck() {
         this.xhrFunction("https://deckofcardsapi.com/api/deck/new/shuffle/?deck_count=1", xhttp => {
-            blackJack.deckId = JSON.parse(xhttp.response).deck_id;
-        })
+            this.deckId = JSON.parse(xhttp.response).deck_id;
+        });
         this.getCards();
     },
     getCards(){
         for (let i = 0; i <= this.numberOfPlayers-1; i++) {
             this.xhrFunction(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=2`, xhttp => {
                 for (const el of JSON.parse(xhttp.response).cards) {
-                    blackJack.players[i].cards.push(el.code);
-                    blackJack.players[i].points.push(blackJack.valueFilter(el.value));   
+                    this.players[i].cards.push(el.code);
+                    this.players[i].points.push( this.valueFilter(el.value));   
                 } 
             })
             if(this.players[i].points[0]==="11" && this.players[i].points[1]==="11"){
@@ -46,9 +56,9 @@ const blackJack = {
             this.xhrFunction(`https://deckofcardsapi.com/api/deck/${this.deckId}/draw/?count=1`, xhttp => {
                 const JSONcardCode = JSON.parse(xhttp.response).cards[0].code;
                 const JSONcardValue = JSON.parse(xhttp.response).cards[0].value;
-                blackJack.players[blackJack.roundPlayer-1].cards.push(JSONcardCode);
-                blackJack.players[blackJack.roundPlayer-1].points.push(blackJack.valueFilter(JSONcardValue)); 
-                blackJack.createBoards();
+                this.players[this.roundPlayer-1].cards.push(JSONcardCode);
+                this.players[this.roundPlayer-1].points.push(this.valueFilter(JSONcardValue)); 
+                this.createBoards();
             })
     },
     endOfTheGame(){
@@ -146,9 +156,7 @@ const blackJack = {
                 } 
             this.divBoard.appendChild(board); 
         }
-
-            this.playerWin();
-        
+        this.playerWin();
         for(const el of this.players){
             if(el.pass){
             document.getElementById(`${el.player}`).classList.add("pass");
@@ -168,16 +176,6 @@ const blackJack = {
             }
         this.createBoards();
     },
-    xhrFunction(url, cFunction){
-        const xhttp = new XMLHttpRequest();
-        xhttp.open("GET", url, false);
-        xhttp.onreadystatechange = function() {
-          if (this.readyState === XMLHttpRequest.DONE && this.status === 200) {
-            cFunction(this);
-          }
-       };
-        xhttp.send(null);
-    },
     valueFilter(value){
         if(value.length > 2){
           this.valueFilter.pairs = {
@@ -187,8 +185,8 @@ const blackJack = {
             ACE: 11
             }
             return value.replace(/[A-Z]{1,}/g, function(c) {
-                return blackJack.valueFilter.pairs[c]
-            })  
+                return this.valueFilter.pairs[c]
+            }.bind(this))  
         }return value;     
     },
     sumPoints(){
@@ -203,26 +201,26 @@ const blackJack = {
     }
 };
 
-document.addEventListener("DOMContentLoaded", () => {
-    const menuButtonsContainer = document.querySelector(".menu-button-container");
-    const menuButtons = menuButtonsContainer.querySelectorAll("button");
-    const addCard = document.getElementById("addCard");
-    const pass = document.getElementById("pass");
-    const playAgain = document.getElementById("playAgain");
+document.addEventListener("DOMContentLoaded", function(){
+    const menuButtonsContainer = document.querySelector(".menu-button-container"),
+    menuButtons = menuButtonsContainer.querySelectorAll("button"),
+    addCard = document.getElementById("addCard"),
+    pass = document.getElementById("pass"),
+    playAgain = document.getElementById("playAgain");
 
     menuButtons.forEach(item => {
         item.addEventListener('click', () => {
-            blackJack.numberOfPlayers = parseInt(item.value,10);
-            blackJack.createPlayers();
+            this.numberOfPlayers = parseInt(item.value,10);
+            this.createPlayers();
         })
       })
     addCard.addEventListener("click", () => {
-        blackJack.addOneCard();
+        this.addOneCard();
     });
     pass.addEventListener("click", () => {
-        blackJack.playerPass();
+        this.playerPass();
     });
     playAgain.addEventListener("click", () => {
         window.location.reload();
     });
-});
+}.bind(blackJack));
